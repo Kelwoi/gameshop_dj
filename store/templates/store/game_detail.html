@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ game.title }} | Game Store{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-md-5">
+    <div class="card">
+      {% if game.cover %}
+        <img src="{{ game.cover.url }}" class="card-img-top" alt="{{ game.title }}">
+      {% else %}
+        <div class="ratio ratio-16x9 bg-light d-flex align-items-center justify-content-center">
+          <span class="text-muted">No cover</span>
+        </div>
+      {% endif %}
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <span class="badge text-bg-secondary">{{ game.platform }}</span>
+          <span class="fw-semibold">{{ game.price_czk }} CZK</span>
+        </div>
+        <div class="text-muted small mt-2">Категорія: {{ game.category.name }}</div>
+        {% if not game.in_stock %}
+          <div class="text-danger small mt-2">Немає в наявності</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-md-7">
+    <h1 class="h3">{{ game.title }}</h1>
+    {% if game.short_description %}<p class="lead">{{ game.short_description }}</p>{% endif %}
+    {% if game.description %}<p>{{ game.description|linebreaks }}</p>{% endif %}
+    <a class="btn btn-outline-secondary" href="{% url 'store:home' %}">← Назад</a>
+  </div>
+</div>
+{% endblock %}

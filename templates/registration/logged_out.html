@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Вихід | Game Store{% endblock %}
+{% block content %}
+  <div class="alert alert-info">Ви вийшли з акаунта.</div>
+  <a class="btn btn-primary" href="{% url 'store:home' %}">На головну</a>
+{% endblock %}

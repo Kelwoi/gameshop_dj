@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Профіль | Game Store{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body text-center">
+        {% if profile.avatar %}
+          <img src="{{ profile.avatar.url }}" class="rounded-circle mb-3" width="120" height="120" style="object-fit:cover" alt="avatar">
+        {% else %}
+          <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mb-3" style="width:120px;height:120px;">
+            <span class="text-muted">No avatar</span>
+          </div>
+        {% endif %}
+        <div class="fw-semibold">{{ profile.display_name|default:user.username }}</div>
+        <div class="text-muted small">@{{ user.username }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <h1 class="h4 mb-3">Налаштування профілю</h1>
+    <form method="post" enctype="multipart/form-data" class="card card-body">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="btn btn-primary" type="submit">Зберегти</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

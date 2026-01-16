@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Каталог | Game Store{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <aside class="col-lg-3">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="h5 mb-3">Фільтри</h2>
+        <form method="get">
+          <div class="mb-3">
+            <label class="form-label">Категорія</label>
+            <select class="form-select" name="category">
+              <option value="">Усі</option>
+              {% for c in categories %}
+                <option value="{{ c.slug }}" {% if active.category == c.slug %}selected{% endif %}>{{ c.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Платформа</label>
+            <select class="form-select" name="platform">
+              <option value="">Усі</option>
+              {% for key,label in platforms %}
+                <option value="{{ key }}" {% if active.platform == key %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col">
+              <label class="form-label">Від (CZK)</label>
+              <input class="form-control" name="min_price" value="{{ active.min_price }}">
+            </div>
+            <div class="col">
+              <label class="form-label">До (CZK)</label>
+              <input class="form-control" name="max_price" value="{{ active.max_price }}">
+            </div>
+          </div>
+
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" name="in_stock" value="1" id="stock" {% if active.in_stock %}checked{% endif %}>
+            <label class="form-check-label" for="stock">Тільки в наявності</label>
+          </div>
+
+          <input type="hidden" name="q" value="{{ active.q }}">
+
+          <button class="btn btn-primary w-100" type="submit">Застосувати</button>
+          <a class="btn btn-outline-secondary w-100 mt-2" href="{% url 'store:home' %}">Скинути</a>
+        </form>
+      </div>
+    </div>
+  </aside>
+
+  <section class="col-lg-9">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h1 class="h4 mb-0">Ігри</h1>
+        {% if active.q %}
+          <div class="text-muted small">Пошук: “{{ active.q }}”</div>
+        {% endif %}
+      </div>
+      <div class="text-muted small">
+        Сторінка {{ page_obj.number }} з {{ page_obj.paginator.num_pages }}
+      </div>
+    </div>
+
+    {% if page_obj.object_list %}
+      <div class="row row-cols-1 row-cols-md-3 g-3">
+        {% for game in page_obj.object_list %}
+          <div class="col">
+            <div class="card h-100">
+              {% if game.cover %}
+                <img src="{{ game.cover.url }}" class="card-img-top" alt="{{ game.title }}">
+              {% else %}
+                <div class="ratio ratio-16x9 bg-light d-flex align-items-center justify-content-center">
+                  <span class="text-muted">No cover</span>
+                </div>
+              {% endif %}
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <h3 class="h6 mb-1"><a href="{{ game.get_absolute_url }}" class="text-decoration-none">{{ game.title }}</a></h3>
+                  <span class="badge text-bg-secondary">{{ game.platform }}</span>
+                </div>
+                <div class="text-muted small mb-2">{{ game.category.name }}</div>
+                <div class="fw-semibold">{{ game.price_czk }} CZK</div>
+                {% if not game.in_stock %}
+                  <div class="text-danger small mt-1">Немає в наявності</div>
+                {% endif %}
+              </div>
+              <div class="card-footer bg-white border-0 pt-0">
+                <a class="btn btn-outline-primary w-100" href="{{ game.get_absolute_url }}">Деталі</a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <nav class="mt-4" aria-label="Pagination">
+        <ul class="pagination">
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?{% for k,v in request.GET.items %}{% if k != 'page' %}{{ k }}={{ v|urlencode }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">«</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">«</span></li>
+          {% endif %}
+
+          {% for num in page_obj.paginator.page_range %}
+            {% if num == page_obj.number %}
+              <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+              <li class="page-item">
+                <a class="page-link" href="?{% for k,v in request.GET.items %}{% if k != 'page' %}{{ k }}={{ v|urlencode }}&{% endif %}{% endfor %}page={{ num }}">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?{% for k,v in request.GET.items %}{% if k != 'page' %}{{ k }}={{ v|urlencode }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">»</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">»</span></li>
+          {% endif %}
+        </ul>
+      </nav>
+    {% else %}
+      <div class="alert alert-warning">Нічого не знайдено. Спробуй змінити фільтри або пошук.</div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}
