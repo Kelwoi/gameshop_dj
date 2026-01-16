@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Успішно | Game Store{% endblock %}
+{% block content %}
+<div class="alert alert-success">
+  ✅ Покупку успішно оформлено (демо).
+</div>
+<a class="btn btn-primary" href="{% url 'store:home' %}">Повернутись до каталогу</a>
+<a class="btn btn-outline-secondary" href="{% url 'store:favorites' %}">Улюблені</a>
+{% endblock %}

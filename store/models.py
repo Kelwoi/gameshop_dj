@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 
+
 class Category(models.Model):
     name = models.CharField(max_length=120, unique=True)
     slug = models.SlugField(max_length=140, unique=True)
@@ -40,3 +41,34 @@ class Game(models.Model):
 
     def get_absolute_url(self):
         return reverse("store:game_detail", kwargs={"slug": self.slug})
+    
+
+
+from django.conf import settings
+
+class Purchase(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "PENDING", "Pending"
+        PAID = "PAID", "Paid"
+        CANCELED = "CANCELED", "Canceled"
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="purchases",
+    )
+    game = models.ForeignKey("Game", on_delete=models.PROTECT, related_name="purchases")
+    email = models.EmailField()
+    full_name = models.CharField(max_length=120)
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Purchase #{self.id} - {self.game.title}"
+
+

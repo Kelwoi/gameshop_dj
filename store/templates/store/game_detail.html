@@ -23,11 +23,28 @@
       </div>
     </div>
   </div>
+
   <div class="col-md-7">
     <h1 class="h3">{{ game.title }}</h1>
     {% if game.short_description %}<p class="lead">{{ game.short_description }}</p>{% endif %}
     {% if game.description %}<p>{{ game.description|linebreaks }}</p>{% endif %}
-    <a class="btn btn-outline-secondary" href="{% url 'store:home' %}">← Назад</a>
+
+    <div class="d-flex flex-wrap gap-2 mt-3">
+      <a class="btn btn-success" href="{% url 'store:buy_game' game.slug %}">Купити</a>
+
+      <form method="post" action="{% url 'store:favorites_toggle' game.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.path }}">
+        {% if is_favorite %}
+          <button class="btn btn-outline-danger" type="submit">❤️ В улюблених</button>
+        {% else %}
+          <button class="btn btn-outline-primary" type="submit">🤍 Додати в улюблене</button>
+        {% endif %}
+      </form>
+
+      <a class="btn btn-outline-secondary" href="{% url 'store:favorites' %}">Улюблені</a>
+      <a class="btn btn-outline-secondary" href="{% url 'store:home' %}">← Назад</a>
+    </div>
   </div>
 </div>
 {% endblock %}
